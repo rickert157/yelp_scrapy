@@ -14,7 +14,8 @@ python3 -m venv venv && ./venv/bin/pip install -r package.txt
 
 ## Debug Mode
 В режиме debug можно парсить по одной странице(preview или single).   
-Необходимо передать type_page - single или preview  
+Необходимо передать --debug для режима отладки  
+Необходимо передать type - single или preview  
 Пример:
 ```sh
 python3 yelp_scraper.py \
