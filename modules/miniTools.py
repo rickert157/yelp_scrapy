@@ -1,7 +1,13 @@
 from typing import Optional
+from shutil import get_terminal_size
 from modules.config import result_dir, preview_info_file
 import os
 import csv
+
+def divide_line():
+    terminal_size = int(get_terminal_size().columns-3)
+    divide = '-'*terminal_size
+    return divide
 
 def init_scraper():
     if not os.path.exists(result_dir):os.makedirs(result_dir)
