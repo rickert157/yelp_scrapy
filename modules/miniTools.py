@@ -41,13 +41,21 @@ def recording_preview_info(
         writer = csv.writer(file)
         writer.writerow([company, company_url, image_url])
 
-def list_done_domain() -> list[str | None]:
-    list_domains = set()
+def list_done_url() -> list[str | None]:
+    list_url = set()
     if os.path.exists(done_file):
         with open(done_file, 'r') as file:
             for line in file.readlines():
-                list_domains.add(line.strip())
-    return list_domains
+                list_url.add(line.strip())
+    return list_url
+
+def full_list_url() -> list[str] | None:
+    list_url = set()
+    with open(preview_info_file, 'r') as file:
+        for row in csv.DictReader(file):
+            url = row['URL']
+            list_url.add(url)
+    return list_url
 
 def recording_single_info(
         company:Optional[str],

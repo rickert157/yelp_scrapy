@@ -10,10 +10,12 @@ from SinCity.colors import (
 from modules.miniTools import (
         init_scraper,
         divide_line,
-        recording_single_info
+        recording_single_info,
+        list_done_url,
+        full_list_url
         )
 from modules.helper import helper
-from modules.config import timeout_parser, preview_info_file
+from modules.config import timeout_parser, preview_info_file, done_file
 from modules.parser_preview import get_preview_info
 from modules.parser_single import get_single_info
 import csv
@@ -70,6 +72,46 @@ def parser_page(url:str, type_page:str, mode:Optional[str]=None) -> dict[str, st
         sys.exit(f'{RED}Необходим передать тип страницы{RESET}')
     return None
 
+def parser_list_single() -> None:
+    try:
+        divide = divide_line()
+        
+        list_url = list_done_url()
+
+        len_full_list_url = len(full_list_url())
+        
+        with open(preview_info_file, 'r') as file:
+            for number_company, row in enumerate(csv.DictReader(file)):
+                company = row['Company']
+                url = row['URL']
+                image_url = row['Image URL']
+                if url not in list_url:
+                    print(
+                            f'[ {GREEN}{number_company+1} / {RED}{len_full_list_url}{RESET} ] '
+                            f'{GREEN}{company}{RESET}'
+                            )
+                    company_info = parser_page(url=url, type_page='single', mode='')
+                   
+                    if company_info:
+                        recording_single_info(
+                                company = company,
+                                domain = company_info['domain'],
+                                phone = company_info['phone'],
+                                image_url = image_url,
+                                category = 'test category'
+                                )
+                    #Не стал выносить в отдельную функцию. Избыточно, думаю
+                    #Просто запишем URL, что бы его больше не обходить
+                    with open(done_file, 'a') as file:
+                        file.write(f'{url}\n')
+    
+    except FileNotFoundError:
+        sys.exit(f'{RED}Проверь наличие базы с URL: {preview_info_file}{RESET}')
+    except KeyError:
+        sys.exit(f'{RED}Проверь правильность наименований колонок{RESET}')
+    except KeyboardInterrupt:
+        sys.exit(f'{RED}\nExit...{RESET}')
+
 if __name__ == '__main__':
     init_scraper()
 
@@ -95,33 +137,8 @@ if __name__ == '__main__':
         parser_page(url=url, mode='debug', type_page=type_page)
     
     elif '--parser-list' in params:
-        try:
-            divide = divide_line()
-            with open(preview_info_file, 'r') as file:
-                for number_company, row in enumerate(csv.DictReader(file)):
-                    company = row['Company']
-                    url = row['URL']
-                    image_url = row['Image URL']
-                    print(
-                            f'[{number_company+1}] {GREEN}{company}{RESET}'
-                            )
-                    company_info = parser_page(url=url, type_page='single', mode='')
-                   
-                    if company_info:
-                        recording_single_info(
-                                company = company,
-                                domain = company_info['domain'],
-                                phone = company_info['phone'],
-                                image_url = image_url,
-                                category = 'test category'
-                                )
-    
-        except FileNotFoundError:
-            sys.exit(f'{RED}Проверь наличие базы с URL: {preview_info_file}{RESET}')
-        except KeyError:
-            sys.exit(f'{RED}Проверь правильность наименований колонок{RESET}')
-        except KeyboardInterrupt:
-            sys.exit(f'{RED}\nExit...{RESET}')
+        #Собираем инфу со всех синглов, перебирая все ссылки
+        parser_list_single()
     elif '--help' in params or '-h' in params:
         helper()
     else:
