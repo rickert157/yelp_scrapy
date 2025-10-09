@@ -1,13 +1,15 @@
 from bs4 import BeautifulSoup
-from SinCity.colors import RED, RESET, GREEN
-from modules.miniTools import modif_url, recording_preview_info
+from SinCity.colors import RED, RESET, GREEN, YELLOW
+from modules.miniTools import modif_url, recording_preview_info, divide_line
 
-def get_preview_info(response) -> list[dict]:
+def get_preview_info(response) -> list[dict[str, str | None] | None]:
     bs = BeautifulSoup(response.text, 'lxml')
+    
+    divide = divide_line()
     
     data_list = []
 
-    for block in bs.find_all(class_='y-css-pwt8yl'):
+    for number_block, block in enumerate(bs.find_all(class_='y-css-pwt8yl')):
         #Перебираем по отдельности каждый блок с рестораном
         try:
             #В этом блоке и название компании, и локальная ссылка на ресторан
@@ -35,6 +37,7 @@ def get_preview_info(response) -> list[dict]:
             data_list.append(company_info)
 
             print(
+                    f'[{number_block+1}]{divide[0:-10]}\n'
                     f'{GREEN}Company name:\t{company_name}\n{RESET}'
                     f'{GREEN}URL Yelp:{RESET}\t{company_modif_url_yelp}\n'
                     f'{GREEN}Image URL:{RESET}\t{image_modif_url}\n'

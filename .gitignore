@@ -1,5 +1,6 @@
 **/*.csv
 **/*.txt
 **/*.json
-venv/
 **/__pycache__/*
+venv/
+trash/
