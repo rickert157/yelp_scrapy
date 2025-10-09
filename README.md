@@ -23,3 +23,8 @@ python3 yelp_scraper.py \
             'https://www.yelp.de/search?find_desc=Zum+Abholen&find_loc=California+City%2C+CA'
 ```
 
+## Финальный сбор
+Для обхода списка URL можно использовать эту команду
+```sh
+python3 yelp_scraper.py --parser-list
+```
